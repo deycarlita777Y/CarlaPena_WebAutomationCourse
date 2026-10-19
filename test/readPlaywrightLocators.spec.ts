@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
   await page.goto('https://qaplayground.com/');
+  await page.waitForLoadState('domcontentloaded');
   await page.getByRole('link', { name: 'Blogs' }).click();
   await page.getByTestId('blog-filter-playwright').click();
   await page.getByTestId('blog-link-getting-started-with-playwright-locators').click();
