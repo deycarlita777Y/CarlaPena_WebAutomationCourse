@@ -4,7 +4,7 @@ test('test', async ({ page }) => {
   await page.goto('https://qaplayground.com/');
   await page.waitForLoadState('domcontentloaded');
   await page.getByRole('link', { name: 'Blogs' }).click({
-    timeout: 10000,
+    timeout: 30000,
     animations: 'disabled',
   });
   await page.getByTestId('blog-filter-playwright').click();
