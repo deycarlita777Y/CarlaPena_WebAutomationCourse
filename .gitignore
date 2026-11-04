@@ -7,3 +7,8 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 /playwright-core/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
