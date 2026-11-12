@@ -1,12 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@fixtures';
+import { users, loginMessages } from '@data/auth.data';
 
-test('test', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-  await page.locator('[data-test="username"]').click();
-  await page.locator('[data-test="username"]').fill('standaruser');
-  await page.locator('[data-test="password"]').click();
-  await page.locator('[data-test="password"]').fill('secret_sauce');
-  await page.locator('[data-test="login-button"]').click();
-  await expect(page.locator('[data-test="error"]')).toBeVisible();
-  await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: Username and password do not match any user in this service');
+test.describe('Login page', () => {
+  test('shows an error when logging in with invalid credentials', async ({ loginPage }) => {
+    await loginPage.login(users.invalidUser.username, users.invalidUser.password);
+
+    await expect(loginPage.errorMessage).toBeVisible();
+    await expect(loginPage.errorMessage).toContainText(loginMessages.invalidCredentials);
+  });
 });

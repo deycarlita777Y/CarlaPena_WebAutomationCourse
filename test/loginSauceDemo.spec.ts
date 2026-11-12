@@ -1,16 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@fixtures';
 
-test('test', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-  await page.locator('[data-test="username"]').click();
-  await page.locator('[data-test="username"]').fill('standard_user');
-  await page.locator('[data-test="password"]').click();
-  await page.locator('[data-test="password"]').fill('secret_sauce');
-  await page.locator('[data-test="login-button"]').click();
-  await expect(page.locator('[data-test="inventory-container"]')).toBeVisible();
-  await expect(page.locator('[data-test="primary-header"]')).toContainText('Swag Labs');
-  await page.getByText('Swag Labs').click();
-  await expect(page.locator('[data-test="primary-header"]')).toContainText('Swag Labs');
-  await expect(page.getByText('Swag Labs')).toBeVisible();
+test.describe('Login', () => {
+  test('redirects to inventory page after valid login', async ({ inventoryPage }) => {
+    await expect(inventoryPage.inventoryContainer).toBeVisible();
+    await expect(inventoryPage.secondaryHeader).toContainText('Products');
+    await expect(inventoryPage.swagLabsLogo).toBeVisible();
+  });
 });
-
