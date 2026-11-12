@@ -11,7 +11,15 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "paths": {
-      "@test/*": ["./test/*"]
+      "@test/*": ["./test/*"],
+      "@pages/*": ["./src/ui/pages/*"],
+      "@components/*": ["./src/ui/components/*"],
+      "@fixtures": ["./src/fixtures/index"],
+      "@fixtures/*": ["./src/fixtures/*"],
+      "@data/*": ["./src/data/*"],
+      "@config/*": ["./src/config/*"],
+      "@helpers/*": ["./src/helpers/*"],
+      "@api/*": ["./src/api/*"]
     },
 
     // Output (type-check only, no emit)
@@ -27,6 +35,7 @@
   },
   "include": [
     "playwright.config.ts",
+    "src/**/*.ts",
     "test/**/*.ts"
   ]
 }

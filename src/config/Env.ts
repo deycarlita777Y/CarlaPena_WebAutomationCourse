@@ -21,9 +21,13 @@ for (const key of REQUIRED_VARS) {
 // ---------------------------------------------------------------------------
 // Exported config — import this everywhere instead of reading process.env directly
 // ---------------------------------------------------------------------------
-export const ENV = {
+export const Env = {
   /** Base URL of the application under test */
   baseUrl: process.env.BASE_URL as string,
+
+  /** Base URL of automationexercise.com (override with AUTOMATION_EXERCISE_URL) */
+  automationExerciseUrl:
+    process.env.AUTOMATION_EXERCISE_URL ?? 'https://www.automationexercise.com',
 
   /** Test user credentials (optional — only required for authenticated tests) */
   testUser: {
