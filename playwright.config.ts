@@ -1,6 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 import { Env } from './src/config/Env';
 
+// Let Node (API requests in fixtures) trust the OS certificate store, so corporate
+// proxy certificates work. Set before workers are spawned; they inherit it.
+process.env.NODE_USE_SYSTEM_CA ??= '1';
+
+const DEMOQA_SPECS = /[\\/]sites[\\/]demoqa[\\/]/;
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -31,17 +37,30 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: DEMOQA_SPECS,
       use: { ...devices['Desktop Chrome'] },
     },
 
     {
       name: 'firefox',
+      testIgnore: DEMOQA_SPECS,
       use: { ...devices['Desktop Firefox'] },
     },
 
     {
       name: 'webkit',
+      testIgnore: DEMOQA_SPECS,
       use: { ...devices['Desktop Safari'] },
+    },
+
+    // demoqa specs run in ONE project (chromium engine) against demoqa.com. They share a single
+    // account, so running them in several browsers at once would invalidate each other's session
+    // and leave data behind (spec-quality-lifecycle-standard R12). Give each browser its own
+    // account (DEMOQA_USER_<BROWSER>) before adding firefox/webkit variants.
+    {
+      name: 'demoqa',
+      testMatch: DEMOQA_SPECS,
+      use: { ...devices['Desktop Chrome'], baseURL: Env.demoqaUrl },
     },
 
     /* Test against mobile viewports. */

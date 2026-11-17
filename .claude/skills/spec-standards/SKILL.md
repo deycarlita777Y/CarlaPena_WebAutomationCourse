@@ -1,6 +1,6 @@
 ---
 name: spec-standards
-description: Enforce organisational and lifecycle standards for spec files in Playwright + TypeScript projects. Covers folder hierarchy ({testRoot}/{suite}/{feature}/), TC{N}-short-name file naming, test.describe naming, TC ID prefixes on test names, and test.step() for step labelling. Load when creating, reviewing, or reorganising spec files, or when the user says "check spec structure".
+description: Enforce organisational and lifecycle standards for spec files in Playwright + TypeScript projects. Covers folder hierarchy ({testRoot}/ui/{suite}/sites/{site}/{feature}/), TC{N}-short-name file naming, test.describe naming, TC ID prefixes on test names, and test.step() for step labelling. Load when creating, reviewing, or reorganising spec files, or when the user says "check spec structure".
 ---
 
 # spec-standards
@@ -18,14 +18,14 @@ Domain split (do not overlap):
 ## Project context
 
 - `{testRoot}` is the `testDir` in `playwright.config.ts` (currently `./test`, so `test/`). Read it from the config — never hardcode `tests/ui`.
-- Required layout: `{testRoot}/{suite}/{feature}/TC{N}-{short-kebab-name}.spec.ts`
+- Required layout: `{testRoot}/ui/{suite}/sites/{site}/{feature}/TC{N}-{short-kebab-name}.spec.ts` (`{site}` = `saucedemo` · `automationexercise` · `demoqa`; `{suite}` = `smoke` · `regression`)
   - `{suite}` = `smoke` (critical path) or `regression` (edge cases, negative paths). Playwright's `testDir` is recursive, so no config change is needed to nest specs.
   - `{feature}` = the **functionality under test**, kebab-case, not the page name (`login/`, `products/`, `cart/`, `checkout/`).
 - Two sites are under test: SauceDemo (`login`, inventory) and automationexercise.com (`products`, via `test.use({ baseURL: Env.automationExerciseUrl })`). Keep that `test.use` line — it is not a violation.
 - TC IDs come from the team / a test-management tool. This skill validates **format only**. `TC0` is reserved for exercises outside the main suite.
 - One spec file per TC; data-driven variants of the same TC stay in the same file.
 - `test.step()` is the only accepted way to label steps. `// Step N:` comments and JSDoc `@steps` are violations.
-- Imports are alias-only (`@fixtures`, `@data/*`, `@config/*`), so moving a spec never requires import rewrites. Specs must not be imported by other specs (`test-standards` rule 6).
+- Imports are alias-only (`@fixtures`, `@data/sites/<site>/*`, `@config/*`), so moving a spec never requires import rewrites. Specs must not be imported by other specs (`test-standards` rule 6).
 
 ## Precedence over test-standards
 
@@ -51,7 +51,7 @@ Fix:   <one sentence> | AUTO-APPLIED | MANUAL — <what is needed from the user>
 ## Rules
 
 ### R1 — FOLDER_STRUCTURE (ERROR, AUTO-FIX)
-**Condition:** a `*.spec.ts` is not at `{testRoot}/{suite}/{feature}/TC{N}-{name}.spec.ts` (e.g. directly under `test/`).
+**Condition:** a `*.spec.ts` is not at `{testRoot}/ui/{suite}/sites/{site}/{feature}/TC{N}-{name}.spec.ts` (e.g. directly under `test/`).
 
 **Auto-fix:**
 1. Pick suite: `regression` for negative-path specs (invalid input, error messages), otherwise `smoke`.
@@ -63,7 +63,7 @@ Feature folder examples: authentication → `login/`, catalogue → `products/`,
 
 ```
 Before: test/productDetail.spec.ts
-After:  test/smoke/products/TC8-verify-all-products-and-detail.spec.ts
+After:  test/ui/smoke/sites/automationexercise/products/TC8-verify-all-products-and-detail.spec.ts
 ```
 
 ### R2 — FILE_NAMING_CONVENTION (ERROR, AUTO-FIX when N known)
@@ -137,4 +137,4 @@ Never touch `src/`, `playwright.config.ts`, or `tsconfig.json` from this skill. 
 
 ## Future modules (not active)
 
-Tagging (`@smoke` / `@regression` via the `tag` option), lifecycle (`beforeAll`/`afterAll` policy), and `test.only`/`test.skip` justification. Until tagging exists, folder = suite; a `test:smoke` npm script would be `playwright test test/smoke`.
+Tagging (`@smoke` / `@regression` via the `tag` option), lifecycle (`beforeAll`/`afterAll` policy), and `test.only`/`test.skip` justification. Until tagging exists, folder = suite; a `test:smoke` npm script would be `playwright test test/ui/smoke`.

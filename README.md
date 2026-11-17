@@ -1,11 +1,6 @@
-# New Project
+# Web Automation Course
 
-A minimal Node.js web project with a simple static frontend.
+Playwright + TypeScript test framework with a layered, per-site architecture (`saucedemo`, `automationexercise`, `demoqa`).
 
-## Run it
-
-```bash
-npm start
-```
-
-Then open: http://127.0.0.1:3000
+- Documentation: see [docs/README.md](docs/README.md) — decisions, wiki, test cases, skill prompts and retros.
+- Run the tests: `npx playwright test` (set the values from `.env.example` in `.env` first).

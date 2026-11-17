@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 
 // Load .env from the project root
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env'), quiet: true });
 
 // ---------------------------------------------------------------------------
 // Required variables — the suite will fail fast if any of these are missing
@@ -28,6 +28,15 @@ export const Env = {
   /** Base URL of automationexercise.com (override with AUTOMATION_EXERCISE_URL) */
   automationExerciseUrl:
     process.env.AUTOMATION_EXERCISE_URL ?? 'https://www.automationexercise.com',
+
+  /** Base URL of demoqa.com (override with DEMOQA_URL) */
+  demoqaUrl: process.env.DEMOQA_URL ?? 'https://demoqa.com',
+
+  /** demoqa.com account (optional — only required for Book Store tests) */
+  demoqaUser: {
+    name: process.env.DEMOQA_USER ?? '',
+    password: process.env.DEMOQA_PASSWORD ?? '',
+  },
 
   /** Test user credentials (optional — only required for authenticated tests) */
   testUser: {
