@@ -37,9 +37,14 @@ export class BookStorePage extends BasePage {
     return (await this.bookList.getByRole('link').allInnerTexts()).map((title) => title.trim());
   }
 
+  /** Catalog link of the book with the given title. */
+  bookLinkByTitle(title: string): Locator {
+    return this.bookList.getByRole('link', { name: title, exact: true });
+  }
+
   /** Opens the detail page of the book with the given title. */
   async clickBookByTitle(title: string): Promise<void> {
-    await this.bookList.getByRole('link', { name: title, exact: true }).click();
+    await this.bookLinkByTitle(title).click();
   }
 
   async searchFor(term: string): Promise<void> {

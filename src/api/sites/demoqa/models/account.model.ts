@@ -10,8 +10,17 @@ export interface LoginResponse {
   token: string;
 }
 
+export interface TokenResponse {
+  token: string;
+}
+
 export interface UserAccount {
   userId: string;
   username: string;
   books?: Book[];
+}
+
+export interface CreateUserResponse {
+  userID: string;
+  username: string;
 }

@@ -184,6 +184,7 @@ await expect(inventoryPage.title).toBeVisible();   // ✅ before acting on the n
 // ❌ await expect(cart.items.first()).toBeVisible();
 // ✅ await expect(cart.itemByName(name)).toBeVisible();   or   toHaveCount(n) / toHaveText(...)
 ```
+The exact value must come from a controlled source (created fixture, mock payload, dataset row, API discovery) — see `spec-data-standard` R13/M4.
 
 ### R11 — TEARDOWN_VERIFIED (ERROR, MANUAL-FIX)
 **Condition:** a `clean<Resource>` fixture or its API method (a) runs only before OR only after the test, (b) trusts the delete status code (e.g. `204`) without reading the resource back to confirm it is empty, or (c) swallows errors / does not throw when the resource is still dirty.

@@ -1,60 +1,52 @@
 import { test, expect } from '@fixtures';
-import { bookStoreUsers } from '@data/sites/demoqa/auth.data';
-import { seededCollection } from '@data/sites/demoqa/books.data';
+import { bookAlerts, seededCollection, seededTitles } from '@data/sites/demoqa/books.data';
 
 test.describe('Books', () => {
   test(
     'TC08: Delete a specific book from the user\'s collection',
-    async ({ bookStorePage, bookStoreLoginPage, profilePage, createdBooks }) => {
+    { tag: ['@mutates-data'] },
+    async ({ page, bookStorePage, bookStoreLoginPage, profilePage, createdBooks, workerUser }) => {
       // createdBooks seeds the collection via API (precondition) and empties it afterwards (teardown).
-      let bookA = '';
-      let totalRows = 0;
-      let remainingTitles: string[] = [];
+      // Expected titles come from the seeded books, never from values read back from the UI.
+      const [bookA, bookB] = seededTitles(createdBooks);
 
-      await test.step('Log in and navigate to the profile page', async () => {
+      await test.step('1. Open /login; the username input is visible', async () => {
         await bookStorePage.navigate('/login');
-        await bookStoreLoginPage.login(bookStoreUsers.appUser.username, bookStoreUsers.appUser.password);
+        await expect(bookStoreLoginPage.usernameInput).toBeVisible();
+      });
+
+      await test.step('2. Log in with the worker account; the URL path is /profile', async () => {
+        await bookStoreLoginPage.login(workerUser.username, workerUser.password);
+        await expect(page).toHaveURL(/\/profile$/);
+      });
+
+      await test.step('3. Open /profile; the books table has exactly the seeded rows', async () => {
         await profilePage.navigate('/profile');
+        await expect(profilePage.bookRows).toHaveCount(seededCollection.size);
       });
 
-      await test.step('Assert the books table contains at least two book rows', async () => {
-        await expect(profilePage.bookRows).toHaveCount(createdBooks.length);
-        expect(createdBooks.length).toBeGreaterThanOrEqual(seededCollection.size);
+      await test.step('4. Read the titles; bookA and bookB each have exactly 1 row (order not asserted)', async () => {
+        await expect(profilePage.bookRowByTitle(bookA)).toHaveCount(1);
+        await expect(profilePage.bookRowByTitle(bookB)).toHaveCount(1);
       });
 
-      await test.step('Note the first book as Book A and count the total rows as N', async () => {
-        const titles = await profilePage.getBookTitles();
-        bookA = titles[0] ?? '';
-        totalRows = titles.length;
-        remainingTitles = titles.slice(1);
-        expect(bookA).not.toBe('');
-      });
-
-      await test.step('Click the delete icon for Book A', async () => {
-        await profilePage.deleteIconForBook(bookA).click();
-      });
-
-      await test.step('Assert a confirmation dialog appears with OK and Cancel buttons', async () => {
+      await test.step('5. Click the delete icon for bookA; the dialog shows OK and Cancel', async () => {
+        await profilePage.openDeleteDialog(bookA);
         await expect(profilePage.deleteConfirmationDialog).toBeVisible();
         await expect(profilePage.deleteDialogOkButton).toBeVisible();
         await expect(profilePage.deleteDialogCancelButton).toBeVisible();
       });
 
-      await test.step('Click OK and assert the dialog closes', async () => {
+      await test.step('6. Click OK; the alert is "Book deleted." and the dialog closes', async () => {
         const message = await profilePage.confirmDeletion();
-        expect(message).toBe(seededCollection.deleteSuccessMessage);
+        expect(message).toBe(bookAlerts.deleted);
         await expect(profilePage.deleteConfirmationDialog).toBeHidden();
       });
 
-      await test.step('Assert Book A is gone and the table has N - 1 rows', async () => {
+      await test.step('7. Only bookB remains: bookA rows = 0, total rows = 1, remaining row = bookB', async () => {
         await expect(profilePage.bookRowByTitle(bookA)).toHaveCount(0);
-        await expect(profilePage.bookRows).toHaveCount(totalRows - 1);
-      });
-
-      await test.step('Assert the remaining books are still present and unchanged', async () => {
-        for (const title of remainingTitles) {
-          await expect(profilePage.bookRowByTitle(title)).toBeVisible();
-        }
+        await expect(profilePage.bookRows).toHaveCount(seededCollection.size - 1);
+        await expect(profilePage.bookTitleLinks).toHaveText([bookB]);
       });
     },
   );

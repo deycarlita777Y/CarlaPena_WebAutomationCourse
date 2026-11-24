@@ -13,7 +13,7 @@ Detect test writing and organisation violations and auto-apply fixes whenever po
 - tsconfig `target: ES2022` → `useDefineForClassFields: true` → locators are getters.
 - `baseURL` is configured in `playwright.config.ts` via `process.env.BASE_URL` (loaded by dotenv).
 - `src/config/Env.ts` validates all required env vars at startup with descriptive errors.
-- `src/data/sites/<site>/auth.data.ts` defines test users per site (e.g. saucedemo `users.appUser` from Env; demoqa `demoqaUser`).
+- `src/data/sites/<site>/auth.data.ts` defines test users per site (e.g. saucedemo `users.appUser` from Env; demoqa `workerUser` fixture, built by `buildWorkerUser`).
 - Path aliases are the only allowed import style — relative paths are always a violation.
 - Layered, per-site architecture: every layer is split by site under a `sites/` folder. Sites: `saucedemo` · `automationexercise` · `demoqa`. Only `BasePage` and `src/config/` are shared.
 
@@ -125,7 +125,7 @@ Specs must not import from other spec files.
 **Auto-fix:** Move shared data to `src/data/sites/<site>/` and update imports.
 
 ### 8. No hardcoded credentials in specs
-Credentials must come from the site's data file (e.g. `users.*` from `@data/sites/saucedemo/auth.data`, `demoqaUser` from `@data/sites/demoqa/auth.data`) or `Env.*` (from `@config/Env`).
+Credentials must come from the site's data file (e.g. `users.*` from `@data/sites/saucedemo/auth.data`, `workerUser` (fixture) for demoqa) or `Env.*` (from `@config/Env`). Which identity a test uses (shared / per worker / per test) is governed by `spec-data-standard` R1.
 
 **Auto-fix:** Replace string literals with `users.appUser.username` / `users.appUser.password`.
 

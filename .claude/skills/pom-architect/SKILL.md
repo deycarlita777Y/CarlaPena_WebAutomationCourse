@@ -13,7 +13,7 @@ Detect Page Object Model violations and auto-apply fixes whenever possible.
 - tsconfig `target: ES2022` → `useDefineForClassFields: true` → locators MUST be getters, not constructor fields.
 - `baseURL` is configured in `playwright.config.ts` via `process.env.BASE_URL` (loaded by dotenv).
 - `src/config/Env.ts` validates all required env vars at startup with descriptive errors.
-- `src/data/sites/<site>/auth.data.ts` defines test users per site (e.g. saucedemo `users.appUser` from Env; demoqa `demoqaUser`).
+- `src/data/sites/<site>/auth.data.ts` defines test users per site (e.g. saucedemo `users.appUser` from Env; demoqa `workerUser` fixture, built by `buildWorkerUser`).
 - Path aliases are the only allowed import style — relative paths are always a violation (see `test-standards`).
 
 ## Output format

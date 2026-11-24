@@ -1,11 +1,17 @@
-import { Env } from '@config/Env';
+import { uniqueName } from '@data/factories/unique';
 
-export const bookStoreUsers = {
-  appUser: {
-    username: Env.demoqaUser.name,
-    password: Env.demoqaUser.password,
-  },
-} as const;
+export interface DemoqaCredentials {
+  username: string;
+  password: string;
+}
 
-/** Account used by the API teardown fixture (same account as the UI login). */
-export const demoqaUser = bookStoreUsers.appUser;
+/**
+ * Builds a unique, prefixed demoqa account for one worker. The password satisfies demoqa's
+ * policy (upper, lower, digit, special, 8+ chars) and is generated, never stored.
+ */
+export function buildWorkerUser(parallelIndex: number): DemoqaCredentials {
+  return {
+    username: uniqueName('user', parallelIndex),
+    password: `Aa1!${Math.random().toString(36).slice(2, 10)}`,
+  };
+}

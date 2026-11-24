@@ -1,10 +1,10 @@
 import { test, expect } from '@fixtures';
-import { bookStoreUsers } from '@data/sites/demoqa/auth.data';
 
 test.describe('Books', () => {
   test(
     'TC02: Add a book to the user\'s collection',
-    async ({ bookStorePage, bookStoreLoginPage, bookDetailPage, profilePage, cleanBookshelf }) => {
+    { tag: ['@mutates-data'] },
+    async ({ bookStorePage, bookStoreLoginPage, bookDetailPage, profilePage, cleanBookshelf, workerUser }) => {
       // cleanBookshelf is injected for its post-test API teardown (deleteAllBooks).
       void cleanBookshelf;
 
@@ -17,7 +17,7 @@ test.describe('Books', () => {
 
       await test.step('Click Login and authenticate with valid credentials', async () => {
         await bookStorePage.loginLink.click();
-        await bookStoreLoginPage.login(bookStoreUsers.appUser.username, bookStoreUsers.appUser.password);
+        await bookStoreLoginPage.login(workerUser.username, workerUser.password);
         // After login demoqa redirects to /profile — navigate back to the catalog
         await bookStorePage.navigate('/books');
       });

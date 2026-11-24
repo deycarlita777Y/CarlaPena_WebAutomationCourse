@@ -19,6 +19,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
+  // spec-data: serial — CI is capped at one worker to limit load on the shared remote demoqa.com; data isolation does not depend on it (per-worker account via workerUser)
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [['list'], ['html', { open: 'never' }]],
@@ -53,13 +54,15 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
 
-    // demoqa specs run in ONE project (chromium engine) against demoqa.com. They share a single
-    // account, so running them in several browsers at once would invalidate each other's session
-    // and leave data behind (spec-quality-lifecycle-standard R12). Give each browser its own
-    // account (DEMOQA_USER_<BROWSER>) before adding firefox/webkit variants.
+    // demoqa specs run in ONE project (chromium engine) against demoqa.com. Each worker creates its own
+    // account through the API (workerUser fixture, spec-data-standard R1), so workers no longer share
+    // an identity. Firefox/webkit variants can be added once a project-scoped run is verified (M5).
     {
       name: 'demoqa',
       testMatch: DEMOQA_SPECS,
+      // Fixture setup/teardown (API calls to the remote demoqa.com) counts inside the test timeout:
+      // a mutating TC takes ~16s of fixtures + ~12s of steps, so the 30s default fails intermittently.
+      timeout: 90_000,
       use: { ...devices['Desktop Chrome'], baseURL: Env.demoqaUrl },
     },
 

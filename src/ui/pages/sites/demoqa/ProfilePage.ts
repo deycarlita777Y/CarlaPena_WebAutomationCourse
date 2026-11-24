@@ -32,6 +32,16 @@ export class ProfilePage extends BasePage {
     return this.bookRowByTitle(title).getByTitle('Delete');
   }
 
+  /** Title links of every listed book (for web-first assertions on the whole list). */
+  get bookTitleLinks(): Locator {
+    return this.bookRows.getByRole('link');
+  }
+
+  /** Clicks the delete icon of the given book; the confirmation modal opens. */
+  async openDeleteDialog(title: string): Promise<void> {
+    await this.deleteIconForBook(title).click();
+  }
+
   /** Titles of every book currently listed, in table order. */
   async getBookTitles(): Promise<string[]> {
     return this.bookRows.getByRole('link').allInnerTexts();

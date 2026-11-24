@@ -67,7 +67,9 @@ After:  test/ui/smoke/sites/automationexercise/products/TC8-verify-all-products-
 ```
 
 ### R2 — FILE_NAMING_CONVENTION (ERROR, AUTO-FIX when N known)
-**Condition:** filename does not match `TC{N}-{1–5 kebab words}.spec.ts`: `N` is an unpadded non-negative integer, no underscores, no hyphen between `TC` and `N`, no camelCase/PascalCase. `N` must equal the `N` in the `test('TC{N}: …')` inside.
+**Condition:** filename does not match `TC{N}-{1–5 kebab words}.spec.ts`: `N` is a non-negative integer, no underscores, no hyphen between `TC` and `N`, no camelCase/PascalCase. `N` must equal the `N` in the `test('TC{N}: …')` inside, written identically (`TC07` ≠ `TC7`).
+
+**Padding is per site, not per file:** unpadded by default (`TC8`). A site whose TC document (`docs/test-cases/<site>/*.md`) numbers its TCs with two digits (`TC01`…`TC10`) uses two-digit zero-padded IDs in every spec of that site (`TC07`). Currently: `demoqa` → two-digit padded; `saucedemo` · `automationexercise` → unpadded. Mixing padded and unpadded IDs inside one site is the violation, and so is a spec ID that differs from the ID of the TC document section it implements. The auto-fix never strips the padding of a padded site.
 
 **Auto-fix:** read `N` from the test name, build the description from the first ≤5 significant words after the colon, rename with `git mv`. If no `N` exists → MANUAL (see hard rule).
 
@@ -87,7 +89,7 @@ test.describe('Login', () => {        // ✅
 ```
 
 ### R4 — TC_ID_NAMING_CONVENTION (ERROR, AUTO-FIX when N known)
-**Condition:** a `test()` name does not start with `TC{N}: ` (capital TC, integer, colon, space) or `N` ≠ the filename's `N`.
+**Condition:** a `test()` name does not start with `TC{N}: ` (capital TC, integer, colon, space) or `N` ≠ the filename's `N` (same text, including padding per R2).
 
 **Auto-fix:** prepend / correct the prefix using `N` from the filename (validated by R2). If neither has an `N` → MANUAL.
 

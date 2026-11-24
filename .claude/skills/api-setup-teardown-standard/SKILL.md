@@ -130,7 +130,7 @@ return this.client.get<Book[]>(BooksEndpoints.base);     // ✓
 **Fix:** retype to `ApiClient` and update usages.
 
 ### R4 — TEARDOWN_MIRRORS_SETUP (ERROR, MANUAL-FIX)
-**Condition:** a fixture in `src/fixtures/**` calls a create/post controller method before `use()` and has no delete/cleanup call after `use()`.
+**Condition:** a fixture in `src/fixtures/**` calls a create/post controller method before `use()` and has no delete/cleanup call after `use()`. Applies equally to `{ scope: 'worker' }` fixtures (`spec-data-standard` M1).
 **Why manual:** the cleanup needs the identifier returned by the create call; guessing risks wrong deletes.
 ```typescript
 createdBook: async ({ request }, use) => {
@@ -168,7 +168,7 @@ test('TC10: …', async ({ page, createdBook }) => { … });                    
 ```
 
 ### R8 — LIFECYCLE_FIXTURE_NAMING_CONVENTION (WARNING, AUTO-FIX)
-**Condition:** a lifecycle fixture does not follow the pattern in the decision table (`<resource>Controller`, `created<Resource>`, `clean<Resource>`, `mock<Resource>`).
+**Condition:** a lifecycle fixture does not follow the pattern in the decision table (`<resource>Controller`, `created<Resource>`, `clean<Resource>`, `mock<Resource>`; `worker<Resource>` for worker-scoped identities per `spec-data-standard`).
 **Fix:** rename the key and every spec reference.
 
 ### R9 — TOKEN_REFRESH_IN_TEARDOWN (WARNING, MANUAL-FIX)

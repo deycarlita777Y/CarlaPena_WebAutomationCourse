@@ -1,11 +1,11 @@
 ---
 name: automation-architect
-description: Hub skill that orchestrates pom-architect, test-standards, spec-standards, spec-quality-lifecycle-standard, api-setup-teardown-standard and git-standards for Playwright + TypeScript projects. Use for full architecture enforcement (review + auto-fix) on existing files, to scaffold new Page Objects, fixtures and spec files, to sync the README with the architecture, or to consult the project context, sub-skill registry and framework growth rules. Invoke sub-skills independently for targeted checks.
+description: Hub skill that orchestrates pom-architect, test-standards, spec-standards, spec-requirements-standard, spec-quality-lifecycle-standard, api-setup-teardown-standard, spec-data-standard and git-standards for Playwright + TypeScript projects. Use for full architecture enforcement (review + auto-fix) on existing files, to scaffold new Page Objects, fixtures and spec files, to sync the README with the architecture, or to consult the project context, sub-skill registry and framework growth rules. Invoke sub-skills independently for targeted checks.
 ---
 
 # automation-architect (hub)
 
-Orchestrates `pom-architect`, `test-standards`, `spec-standards` (TC organisation rules), `spec-quality-lifecycle-standard` (TC body quality), `api-setup-teardown-standard` (API layer + setup/teardown infrastructure) and `git-standards` (git workflow conventions). Invoke those sub-skills directly for targeted checks.
+Orchestrates `pom-architect`, `test-standards`, `spec-standards` (TC organisation rules), `spec-requirements-standard` (TC specification documents), `spec-quality-lifecycle-standard` (TC body quality), `api-setup-teardown-standard` (API layer + setup/teardown infrastructure) and `git-standards` (git workflow conventions). Invoke those sub-skills directly for targeted checks.
 
 ## Project Context
 
@@ -52,10 +52,10 @@ src/ui/pages/sites/<site>/              Page Objects per site (pom-architect)   
 src/api/client/ApiClient.ts             only HTTP entry point (shared)             (api-setup-teardown-standard)
 src/api/sites/<site>/                   per site: endpoints/ (URL constants) · models/ (interfaces) ·
                                         controllers/ (business operations) · mocks/ (route stubs)   (api-setup-teardown-standard)
-src/data/sites/<site>/                  test data per site (auth.data.ts, ...)
+src/data/sites/<site>/                  test data per site (auth.data.ts, ...)   (spec-data-standard)
 src/fixtures/index.ts                   mergeTests(...) of the per-site fixture files
 src/fixtures/sites/<site>.fixtures.ts   Playwright fixtures per site (test-standards)
-src/config/Env.ts                       validated env vars (shared; fails fast if BASE_URL missing)
+src/config/Env.ts                       validated env vars (shared; fails fast if BASE_URL missing)   (spec-data-standard)
 test/ui/{suite}/sites/<site>/{feature}/TC{N}-name.spec.ts   specs — {testRoot}/ui/{suite}/sites/<site>/{feature}/
 docs/decisions/     ADRs for hub growth
 .claude/skills/     skill definitions
@@ -89,13 +89,15 @@ Layered, per-site architecture: every layer (ui, api, data, fixtures, tests) is 
 ### Mode 1 — Full pipeline (default)
 **Triggered by:** "aplicar arquitectura", "apply architecture", "full review", "enforce all rules"
 
+0. Run `spec-requirements-standard` M0 on `docs/test-cases/**` (report only, no auto-fix except Q13). TCs graded Incomplete are listed as manual items.
 1. Identify all relevant files (specs, Page Objects, fixtures, data files).
 2. Run `pom-architect` — detect + auto-fix all POM violations.
 3. Run `test-standards` — detect + auto-fix all test writing violations.
 4. Run `spec-standards` — detect + auto-fix folder, naming, TC ID and `test.step()` violations (never invents TC numbers; reports those as manual).
 5. Run `spec-quality-lifecycle-standard` on `{testRoot}/**/*.spec.ts` and `src/ui/pages/**/*.ts` — auto-fix R3, R4; collect R1, R2, R5–R12 as manual fixes.
 6. Run `api-setup-teardown-standard` on `src/api/**`, `src/fixtures/sites/*.fixtures.ts` and `{testRoot}/**/*.spec.ts` — auto-fix R1–R3, R5–R8, R10; collect R4 (teardown) and R9 (token refresh) as manual fixes.
-7. Output a unified summary. Run order matters — see Growth Consideration 8.
+7. Run `spec-data-standard` (M1–M4 rules) on `src/fixtures/**`, `src/data/**`, `src/config/**`, `playwright.config.ts` and specs — auto-fix R2, R3, R6–R9, R11; collect R1, R4, R5, R10, R12–R15 as manual fixes. M0 (assessment) and M5 (executes tests) are never run by the pipeline.
+8. Output a unified summary. Run order matters — see Growth Consideration 8.
 
 ### Mode 2 — Structure only
 **Triggered by:** "revisar estructura", "check structure", "verify folders"
@@ -161,14 +163,15 @@ Steps:
 ```
 
 ### Mode 6 — TC Quality Review
-**Triggered by:** "review tc quality", "check test quality", "scan for flaky patterns", "tc quality"
+**Triggered by:** "review tc quality", "check test quality", "scan for flaky patterns", "tc quality", "assess test cases", "refine test case", "write test case", "tc coverage", "automation readiness", "data robustness", "parallel safe", "multi environment", "assess test data", "verify robustness"
 
 Thin wrapper — no quality rules live in the hub. Use after writing/refactoring test cases, when a test is intermittently failing, and before any PR with new or modified specs.
 
-1. Invoke `spec-quality-lifecycle-standard` (Skill tool): single file given → Enforce on that file; otherwise all `{testRoot}/**/*.spec.ts`.
+1. Route by target: TC **documents** (`docs/test-cases/**`, or the "assess / refine / write / coverage / automation readiness" triggers) → invoke `spec-requirements-standard` (phase 1, Specify). TC **code** → invoke `spec-quality-lifecycle-standard` (Skill tool): single file given → Enforce on that file; otherwise all `{testRoot}/**/*.spec.ts`.
+   Test **data robustness** requests ("data robustness", "parallel safe", "multi environment", "assess test data", "verify robustness") → invoke `spec-data-standard` (no mode of its own): assess/Arrange → M0–M3, Assert → M4, Run → M5.
 2. Forward its output verbatim.
 
-Load `spec-quality-lifecycle-standard` directly for standalone TC review without activating the hub.
+Load `spec-requirements-standard`, `spec-quality-lifecycle-standard` or `spec-data-standard` directly for standalone TC review without activating the hub.
 
 ### Mode 7 — Lifecycle Infrastructure
 **Triggered by:** "setup api layer", "scaffold api", "new controller", "add lifecycle support", "lifecycle architect"
@@ -191,8 +194,10 @@ Full pipeline:
 pom-architect:    X violations found — Y auto-applied
 test-standards:   X violations found — Y auto-applied
 spec-standards:   X violations found — Y auto-applied
+spec-requirements-standard: X TC gaps found — Y auto-applied (Q13 only)
 spec-quality-lifecycle-standard: X violations found — Y auto-applied
 api-setup-teardown-standard: X violations found — Y auto-applied
+spec-data-standard: X violations found — Y auto-applied
 Remaining manual fixes: <list if any, or "none">
 [automation-architect] ✅ All rules satisfied.
 ```
@@ -216,8 +221,10 @@ Single source of truth for all skills. Update whenever a skill is added, changed
 | `pom-architect` | Page Object structure | `src/ui/pages/**/*.ts` (incl. `sites/<site>/`) · `src/ui/components/**/*.ts` | R1–R8 | Active |
 | `test-standards` | Spec code quality | `test/**/*.spec.ts` · `src/fixtures/**/*.ts` | R1–R9 | Active |
 | `spec-standards` | Spec organisation & lifecycle | `{testRoot}/**/*.spec.ts` | R1–R5 | Active |
+| `spec-requirements-standard` | TC specification: traceability · preconditions · data · oracles · postconditions · readiness | `docs/test-cases/**/*.md` | Q1–Q13 · M0–M4 | Active |
 | `spec-quality-lifecycle-standard` | TC body quality · assertions · selectors · waits · flakiness | `{testRoot}/**/*.spec.ts` · `src/ui/pages/**/*.ts` · `src/fixtures/sites/*.fixtures.ts` · `src/api/sites/**` | R1–R12 | Active |
 | `api-setup-teardown-standard` | API layer structure · setup/teardown · fixture injection | `src/api/**/*.ts` · `src/fixtures/sites/*.fixtures.ts` · `{testRoot}/**/*.spec.ts` | R1–R10 | Active |
+| `spec-data-standard` | Test data: classification · isolation · sourcing · environments · expected values | `src/data/**` · `src/config/**` · `src/fixtures/**` · `playwright.config.ts` · `{testRoot}/**/*.spec.ts` | R1–R15 · M0–M5 | Active |
 | `git-standards` | Git workflow | git state (no files) | C1–C4, E1–E5 | Active |
 
 ### Scan scope ownership
@@ -230,6 +237,7 @@ Each file type is owned by exactly one skill per concern; no two skills check th
 | `src/fixtures/**/*.ts` | `test-standards` | fixture completeness, import hygiene |
 | specs — imports, fixtures, credentials | `test-standards` | code quality |
 | specs — folder, naming, TC IDs, steps | `spec-standards` | organisation |
+| `docs/test-cases/**/*.md` | `spec-requirements-standard` | specification content quality (Q1–Q13); Mode 5 never edits these files |
 | specs — preconditions/postconditions | `spec-quality-lifecycle-standard` | R1, R2, R11, R12 |
 | specs — assertion quality, waits, navigation | `spec-quality-lifecycle-standard` | R3, R4, R6, R9, R10 |
 | specs — independence, determinism | `spec-quality-lifecycle-standard` | R7, R8 |
@@ -240,6 +248,11 @@ Each file type is owned by exactly one skill per concern; no two skills check th
 | `src/api/sites/*/mocks/**` | `api-setup-teardown-standard` | route stub structure (R2, R5, R6) |
 | `src/fixtures/sites/*.fixtures.ts` — teardown contract, naming, token refresh | `api-setup-teardown-standard` | R4, R8, R9 (other fixture concerns stay with `test-standards`) |
 | specs — controller/client instantiation | `api-setup-teardown-standard` | R7 |
+| `src/data/**` — shape, typing, uniqueness | `spec-data-standard` | R2, R3, R6 |
+| `src/config/**` — environment selection and validation | `spec-data-standard` | R9 |
+| `src/fixtures/**` — fixture scope and data identity | `spec-data-standard` | R1, R12, R15 (teardown contract stays with `api-setup-teardown-standard`) |
+| `playwright.config.ts` — parallelism suppression | `spec-data-standard` | R4 |
+| specs — data sourcing, env literals, data tags, expected-value source | `spec-data-standard` | R5, R7, R8, R10, R11, R13, R14 |
 | other `src/**/*.ts` | `test-standards` | import hygiene only |
 | branch + commit history | `git-standards` | workflow conventions |
 
@@ -250,8 +263,14 @@ Each file type is owned by exactly one skill per concern; no two skills check th
 | Fix Page Object violations | `pom-architect` | "check page objects" |
 | Fix spec code quality (imports, fixtures, credentials) | `test-standards` | "check test standards" |
 | Fix TC folder / naming / step violations | `spec-standards` | "check spec structure" |
+| Score TC specifications | `spec-requirements-standard` | "assess test cases" |
+| Upgrade an incomplete TC | `spec-requirements-standard` | "refine test case TC02" |
+| Prepare a TC for automation | `spec-requirements-standard` | "automation readiness TC02" |
 | Review TC quality and anti-flakiness patterns | `spec-quality-lifecycle-standard` | "review tc quality" |
 | Scaffold or extend the API layer for setup/teardown | `api-setup-teardown-standard` | "scaffold api for books" |
+| Assess test data maturity | `spec-data-standard` | "assess test data" |
+| Make tests safe in parallel | `spec-data-standard` | "parallel safe" |
+| Verify robustness with evidence | `spec-data-standard` | "verify robustness" |
 | Validate git conventions or run full git workflow | `git-standards` | "check git" / "git workflow" |
 
 Individual violations are reported in the sub-skill format:
@@ -300,6 +319,6 @@ Complement the Hub Growth Policy, which governs mode slots.
 3. **New skill checklist.** Confirm the domain gap (Policy Rule 1) · ADR in `docs/decisions/` (Rule 2) · `SKILL.md` in `.claude/skills/<name>/` with valid `name` + `description` frontmatter · Registry + ownership rows · wire into Mode 1 · invocation-reference row · zero scan overlap · note minimum Playwright version for version-specific APIs.
 4. **Playwright versions.** `test.step()` needs 1.22 (`spec-standards` R5); native `{ tag: [] }` needs 1.42 (future tagging rules). Document version-specific APIs inline when a rule depends on them.
 5. **tsconfig impact.** `target` below ES2022 → review `pom-architect` getter rule · `strict` off → type-safety rules less critical · alias added/removed → update the alias map in `test-standards` and `pom-architect` · `moduleResolution` changed → re-verify import examples in all skills.
-6. **Breaking-change propagation.** `BasePage` → `pom-architect` R1, R5 · `src/fixtures/sites/*.fixtures.ts` pattern → `test-standards` R3, R4 · `src/data/sites/<site>/auth.data.ts` → `test-standards` R8, `pom-architect` R8 · `src/config/Env.ts` → data-hygiene examples · `playwright.config.ts` `testDir` → `spec-standards` R1. Also re-check this Project Context section.
+6. **Breaking-change propagation.** `BasePage` → `pom-architect` R1, R5 · `src/fixtures/sites/*.fixtures.ts` pattern → `test-standards` R3, R4 · `src/data/sites/<site>/auth.data.ts` → `test-standards` R8, `pom-architect` R8 · `src/config/Env.ts` (new variable / `TEST_ENV`) → data-hygiene examples, `spec-data-standard` R9 · `playwright.config.ts` `testDir` → `spec-standards` R1. Also re-check this Project Context section.
 7. **Deprecation.** Mark `[DEPRECATED — reason — YYYY-MM]`, keep one full module cycle without auto-fixing it, remove at the start of the next module with an ADR note, update the Registry counts. Never delete immediately.
-8. **Execution order (Mode 1).** `pom-architect` → `test-standards` → `spec-standards` → `spec-quality-lifecycle-standard` → `api-setup-teardown-standard` → `git-standards` (last, before push/PR). Unfixed PO violations cause false positives in the spec skills.
+8. **Execution order (Mode 1).** `spec-requirements-standard` (report only) → `pom-architect` → `test-standards` → `spec-standards` → `spec-quality-lifecycle-standard` → `api-setup-teardown-standard` → `spec-data-standard` → `git-standards` (last, before push/PR). Unfixed PO violations cause false positives in the spec skills.
