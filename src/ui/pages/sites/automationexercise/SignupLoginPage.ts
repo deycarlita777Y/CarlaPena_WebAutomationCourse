@@ -3,11 +3,12 @@ import { BasePage } from '@pages/BasePage';
 
 export class SignupLoginPage extends BasePage {
   get loginHeading(): Locator {
-    return this.page.locator('#form').getByText('Login to your account');
+    return this.page.getByRole('heading', { name: 'Login to your account' });
   }
 
   get emailInput(): Locator {
     return this.page
+      // locator: the login form has no accessible name, so no form role; filtered by its text
       .locator('form')
       .filter({ hasText: 'Login' })
       .getByPlaceholder('Email Address');

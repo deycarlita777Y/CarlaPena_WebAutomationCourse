@@ -199,7 +199,7 @@ test('TC02: ...', async ({ bookStorePage }) => {
 ```typescript
 test('TC02: ...', async ({ bookStorePage }) => {
   await test.step('Verify catalog is loaded before test begins', async () => {
-    await expect(bookStorePage.pageHeading).toBeVisible();      // ✅ precondition
+    await expect(bookStorePage.bookStoreMenuItem).toBeVisible();      // ✅ precondition
     await expect(bookStorePage.bookList.first()).toBeVisible(); // ✅ precondition
   });
   await test.step('Click first book', async () => {
@@ -443,7 +443,7 @@ await bookStorePage.clickFirstBook(); // ❌ acting on /books without confirming
 **Expected:**
 ```typescript
 await bookStorePage.navigate('/books');
-await expect(bookStorePage.pageHeading).toBeVisible(); // ✅ confirms page loaded
+await expect(bookStorePage.bookStoreMenuItem).toBeVisible(); // ✅ confirms page loaded
 await bookStorePage.clickFirstBook();
 ```
 
@@ -548,7 +548,7 @@ Fix:   <one sentence describing the fix> | AUTO-APPLIED | MANUAL-FIX
 File:  tests/ui/smoke/sites/demoqa/books/TC02-add-book-to-collection.spec.ts
 Line:  18
 Issue: page.waitForTimeout(2000) introduces a fixed delay that causes flakiness.
-Fix:   Replace with expect(bookStorePage.pageHeading).toBeVisible(). | AUTO-APPLIED
+Fix:   Replace with expect(bookStorePage.bookStoreMenuItem).toBeVisible(). | AUTO-APPLIED
 
 [spec-quality-lifecycle-standard] ERROR — PRECONDITION_ASSERTED
 File:  tests/ui/smoke/sites/saucedemo/login/TC0-valid-login.spec.ts
@@ -692,3 +692,12 @@ Fix:   Add expect(profilePage.usernameValue).toBeVisible() immediately after nav
    | Review TC quality and anti-flakiness patterns | `spec-quality-lifecycle-standard` | `"review tc quality"` |
 
 
+
+---
+
+## Revision 4 — locators and waits delegated to `ui-locator-wait-standard`
+
+- **R3 NO_HARDCODED_WAITS** → owned by `ui-locator-wait-standard` R13 (plus R14–R16).
+- **R5 RESILIENT_LOCATORS** → owned by `ui-locator-wait-standard` R1–R8.
+- In the skill, both rules stay as one-line delegations (numbering unchanged); Enforce step 3 forwards those findings; Domain gains `independence` and loses `selectors` and `waits`.
+- The TC lifecycle orchestrator (phases 3 Act / 5 Run) does not exist yet in this repo; hub Mode 6 routes directly. See ADR `0006-add-ui-locator-wait-standard.md`.

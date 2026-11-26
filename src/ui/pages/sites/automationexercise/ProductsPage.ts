@@ -7,6 +7,7 @@ export class ProductsPage extends BasePage {
   }
 
   get productCards(): Locator {
+    // locator: product card is a plain div (no role); scoped to the product list
     return this.page.locator('.features_items .product-image-wrapper');
   }
 
@@ -15,6 +16,7 @@ export class ProductsPage extends BasePage {
   }
 
   get searchButton(): Locator {
+    // locator: icon-only button, no accessible name; unique id
     return this.page.locator('#submit_search');
   }
 
@@ -23,11 +25,13 @@ export class ProductsPage extends BasePage {
   }
 
   get productNames(): Locator {
+    // locator: product name is a bare <p> inside the card, no role
     return this.page.locator('.features_items .productinfo p');
   }
 
   get firstViewProductLink(): Locator {
-    return this.page.locator('a[href^="/product_details/"]').first();
+    // position: opening the first product of the catalog is the TC intent
+    return this.page.getByRole('link', { name: 'View Product' }).first();
   }
 
   async searchProduct(name: string): Promise<void> {

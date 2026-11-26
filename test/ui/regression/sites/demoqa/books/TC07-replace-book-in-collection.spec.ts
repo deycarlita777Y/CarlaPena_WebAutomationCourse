@@ -50,7 +50,6 @@ test.describe('Books', () => {
 
       await test.step('8. Open /books; the catalog lists bookB', async () => {
         await bookStorePage.navigate('/books');
-        await expect(bookStorePage.bookList.first()).toBeVisible();
         await expect(bookStorePage.bookLinkByTitle(bookB)).toBeVisible();
       });
 

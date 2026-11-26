@@ -3,6 +3,7 @@ import { BasePage } from '@pages/BasePage';
 
 export class ProfilePage extends BasePage {
   get usernameValue(): Locator {
+    // locator: value is a <label> with no accessible name; unique id
     return this.page.locator('#userName-value');
   }
 
@@ -12,7 +13,8 @@ export class ProfilePage extends BasePage {
 
   /** Confirmation modal shown after clicking a delete icon ("Delete Book"). */
   get deleteConfirmationDialog(): Locator {
-    return this.page.locator('.modal-content');
+    // role=dialog + aria-labelledby "Delete Book" verified in the DOM (authenticated /profile)
+    return this.page.getByRole('dialog', { name: 'Delete Book' });
   }
 
   get deleteDialogOkButton(): Locator {
@@ -40,11 +42,6 @@ export class ProfilePage extends BasePage {
   /** Clicks the delete icon of the given book; the confirmation modal opens. */
   async openDeleteDialog(title: string): Promise<void> {
     await this.deleteIconForBook(title).click();
-  }
-
-  /** Titles of every book currently listed, in table order. */
-  async getBookTitles(): Promise<string[]> {
-    return this.bookRows.getByRole('link').allInnerTexts();
   }
 
   /** Clicks OK in the confirmation modal, accepts the follow-up browser alert and returns its message. */

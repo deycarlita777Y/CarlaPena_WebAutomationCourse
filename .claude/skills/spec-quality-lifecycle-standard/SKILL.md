@@ -1,6 +1,6 @@
 ---
 name: spec-quality-lifecycle-standard
-description: Enforce and auto-apply test case quality standards for Playwright + TypeScript projects. Governs preconditions, postconditions, assertion quality, selector resilience, wait strategies, and anti-flakiness patterns inside test bodies. Load when creating, reviewing, or debugging test cases, or when the user says "review tc quality", "check test quality" or "scan for flaky patterns".
+description: Enforce and auto-apply test case quality standards for Playwright + TypeScript projects. Governs preconditions, postconditions, assertion quality, independence, and anti-flakiness patterns inside test bodies (locators and waits are delegated to ui-locator-wait-standard). Load when creating, reviewing, or debugging test cases, or when the user says "review tc quality", "check test quality" or "scan for flaky patterns".
 ---
 
 # spec-quality-lifecycle-standard
@@ -14,8 +14,9 @@ Owns the **internal quality of test cases** — what happens inside each `test()
 | TC folder / file naming, TC IDs, describe naming, `test.step()` presence | `spec-standards` |
 | Imports, fixtures registration, credentials, framework | `test-standards` |
 | Page Object structure, locator getters | `pom-architect` |
+| Locator strategy, uniqueness, actions, waits, polling, timeouts | `ui-locator-wait-standard` (R3 and R5 delegate here) |
 | Git workflow | `git-standards` |
-| **Pre/postconditions, assertion quality, selector resilience, waits, independence** | **this skill** |
+| **Pre/postconditions, assertion quality, independence** | **this skill** |
 
 Do not re-report what another skill owns (e.g. a missing `test.step()` is `spec-standards`; a step with no assertion is R6 here).
 
@@ -36,7 +37,8 @@ Do not re-report what another skill owns (e.g. a missing `test.step()` is `spec-
 ```
 1. Missing precondition assertion  → R1        4. Fragile selector           → R5
 2. Missing / unverified teardown   → R2, R11   5. Assertion not tied to action → R6, R10
-3. Hardcoded wait / race           → R3, R9    6. Shared account in parallel → R12
+3. Hardcoded wait / race           → R3*, R9   6. Shared account in parallel → R12
+(* R3 and R5 are owned by `ui-locator-wait-standard`)
 Also: order dependence R7, non-determinism R8, point-in-time asserts R4
 ```
 
@@ -47,7 +49,7 @@ Also: order dependence R7, non-determinism R8, point-in-time asserts R4
 
 1. Discover `{testRoot}/**/*.spec.ts` (or the single file given) and `src/ui/pages/**/*.ts`.
 2. Apply the rules per Scan scope.
-3. Auto-fix every AUTO-FIX violation; collect MANUAL-FIX ones (ERRORs before WARNINGs).
+3. Auto-fix every AUTO-FIX violation; collect MANUAL-FIX ones (ERRORs before WARNINGs). For locator and wait findings (R3, R5) forward to `ui-locator-wait-standard` (M1–M5) instead of fixing them here.
 4. Emit the report:
 
 ```
@@ -95,8 +97,8 @@ Fix:   <one sentence> | AUTO-APPLIED | MANUAL-FIX
 
 | File glob | Rules |
 |---|---|
-| `{testRoot}/**/*.spec.ts` | R1, R2, R3, R4, R6, R7, R8, R9, R10 |
-| `src/ui/pages/**/*.ts` | R3, R4, R5 |
+| `{testRoot}/**/*.spec.ts` | R1, R2, R3 (delegated), R4, R6, R7, R8, R9, R10 |
+| `src/ui/pages/**/*.ts` | R3 (delegated), R4, R5 (delegated) |
 | `src/fixtures/sites/*.fixtures.ts` · `src/api/sites/**/*.ts` | R11 |
 | `playwright.config.ts` + specs using a shared-account fixture | R12 |
 
@@ -121,19 +123,8 @@ await test.step('Verify inventory is loaded before test begins', async () => {
 test('TC02: ...', async ({ bookStorePage, cleanBookshelf }) => { void cleanBookshelf; /* ... */ });
 ```
 
-### R3 — NO_HARDCODED_WAITS (ERROR, AUTO-FIX)
-**Condition:** `page.waitForTimeout(N)`, `setTimeout(...)`, or `new Promise(r => setTimeout(r, N))` in a spec or Page Object.
-**Auto-fix:** replace with a semantic wait:
-
-| Wait for | Replacement |
-|---|---|
-| element | `await expect(locator).toBeVisible()` |
-| navigation | `await page.waitForURL(pattern)` + an assertion |
-| element gone | `await expect(locator).toBeHidden()` |
-| text change | `await expect(locator).toHaveText(text)` |
-| network idle | `page.waitForLoadState('networkidle')` (sparingly) |
-
-If no target element can be inferred from the next action, report MANUAL instead of guessing.
+### R3 — NO_HARDCODED_WAITS (ERROR) — delegated
+Owned by `ui-locator-wait-standard` **R13** (fixed waits) and R14–R16 (terminal-state waits). Not checked here; forward findings to M4 of that skill.
 
 ### R4 — WEB_FIRST_ASSERTIONS (ERROR, AUTO-FIX)
 **Condition:** `expect(await <locator>.<read>())` where a web-first matcher exists.
@@ -150,10 +141,8 @@ If no target element can be inferred from the next action, report MANUAL instead
 
 `toContain` on text → `toContainText`. Page Objects must not contain `expect()` at all (`pom-architect` R5/R6) — in POs, R4 applies only to `assert*` methods.
 
-### R5 — RESILIENT_LOCATORS (WARNING, MANUAL-FIX)
-**Condition:** a PO locator relies on `.first()`/`.nth(n)` as sole disambiguation, long CSS chains (`div > ul > li:nth-child(2) > span`), XPath, or data-dependent text (`getByText('1 item')`).
-**Prefer:** `getByRole(..., { name })` · `getByLabel` · `locator('[data-testid=...]')` · unique `#id` · `getByText(..., { exact: true })` for static text.
-`.first()`/`.nth()` is acceptable only when already scoped to a container and position is meaningful — document with a comment.
+### R5 — RESILIENT_LOCATORS (WARNING) — delegated
+Owned by `ui-locator-wait-standard` **R1–R8** (hierarchy, justified CSS/XPath, fragile selectors, positions, scope/filter). Not checked here; forward findings to M1–M2 of that skill.
 
 ### R6 — STEP_ASSERTS_RESULT (WARNING, MANUAL-FIX)
 **Condition:** a `test.step()` performs user-facing actions but contains no `expect`.
@@ -222,9 +211,9 @@ Fix:   Add a first step asserting the login form is visible. | MANUAL-FIX
 | Unknown start state | R1 | no assertion in first step |
 | Dirty previous state | R2, R11 | no `clean<Resource>`, or clean not verified |
 | Parallel runs on one account | R12 | `User not authorized!`, leftover data |
-| Timing assumption | R3 | `waitForTimeout` |
+| Timing assumption | R3 → `ui-locator-wait-standard` R13 | `waitForTimeout` |
 | Point-in-time evaluation | R4 | `await locator.textContent()` in `expect` |
-| DOM dependency | R5 | CSS chains, XPath, `.nth()` |
+| DOM dependency | R5 → `ui-locator-wait-standard` R1–R8 | CSS chains, XPath, `.nth()` |
 | Silent action failure | R6 | step without assertion |
 | Order dependency | R7 | shared `let` |
 | Non-deterministic path | R8 | `if/else` in test |

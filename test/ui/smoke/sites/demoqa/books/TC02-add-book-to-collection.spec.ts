@@ -12,7 +12,7 @@ test.describe('Books', () => {
 
       await test.step('Navigate to Book Store catalog', async () => {
         // bookStorePage fixture already navigated to /books (unauthenticated)
-        await expect(bookStorePage.pageHeading).toBeVisible();
+        await expect(bookStorePage.bookStoreMenuItem).toBeVisible();
       });
 
       await test.step('Click Login and authenticate with valid credentials', async () => {
@@ -23,7 +23,7 @@ test.describe('Books', () => {
       });
 
       await test.step('Verify catalog is displayed with at least one book', async () => {
-        await expect(bookStorePage.bookList.first()).toBeVisible();
+        await expect(bookStorePage.bookList).not.toHaveCount(0);
       });
 
       await test.step('Click on the first book to open its detail page', async () => {

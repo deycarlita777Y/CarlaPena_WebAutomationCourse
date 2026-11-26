@@ -161,3 +161,34 @@ Description: lowercase, no period at end.
 | `playwright.config.ts` / `package.json` | `README.md §3/§5` |
 
 **Project override:** Push directly to `main` (no branches/PRs for this project).
+
+---
+
+## ui-locator-wait-standard
+
+Governs `src/ui/pages/**`, `src/ui/components/**`, `test/**/*.spec.ts`, `src/fixtures/**`, `playwright.config.ts`. Hub Mode 6 routes here (M1–M5 Act, M6 Run). Took over `spec-quality-lifecycle-standard` R3 and R5. ADR: `docs/decisions/0006-add-ui-locator-wait-standard.md`.
+
+**Modes:** M0 assessment · M1 locator strategy · M2 uniqueness · M3 actions · M4 waits · M5 polling & timeouts · M6 verification (runs tests).
+
+| Rule | Name | Sev. / fix |
+|---|---|---|
+| R1 | LOCATOR_HIERARCHY (test-id contract → role → label → placeholder → text → alt → title → CSS/XPath) | ERROR, MANUAL |
+| R2 | JUSTIFIED_CSS_XPATH | WARNING, MANUAL |
+| R3 | NO_FRAGILE_SELECTORS | ERROR, MANUAL |
+| R4 | NO_INVENTED_ATTRIBUTES | ERROR, MANUAL |
+| R5 | NO_POSITIONAL_WITHOUT_RULE | WARNING, MANUAL |
+| R6 | SCOPE_AND_FILTER | WARNING, MANUAL |
+| R7 | FILTER_BEFORE_ITERATE | WARNING, MANUAL |
+| R8 | AMBIGUITY_FAILS_CLEARLY | ERROR, MANUAL |
+| R9 | ACTION_MATCHES_ELEMENT | ERROR, AUTO |
+| R10 | NO_ACTIONABILITY_BYPASS | ERROR, MANUAL |
+| R11 | LOCATOR_NOT_HANDLE | ERROR, AUTO |
+| R12 | INTENTIONAL_READS | WARNING, MANUAL |
+| R13 | NO_FIXED_WAITS | ERROR, AUTO |
+| R14 | WAIT_FOR_TERMINAL_STATE | ERROR, MANUAL |
+| R15 | NO_REDUNDANT_WAITS | WARNING, AUTO |
+| R16 | NO_SOFT_ASSERT_AS_SYNC | ERROR, AUTO |
+| R17 | BOUNDED_POLLING | ERROR, MANUAL |
+| R18 | TERMINAL_FAILURE_STATES | ERROR, MANUAL |
+| R19 | TIMEOUT_HIERARCHY | WARNING, MANUAL |
+| R20 | DIAGNOSTIC_WAIT_MESSAGE | WARNING, AUTO |

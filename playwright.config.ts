@@ -29,6 +29,9 @@ export default defineConfig({
     baseURL: Env.baseUrl,
     headless: true,
 
+    /* Test-id contract (saucedemo): elements carry data-test; getByTestId() resolves it. Other sites do not use test ids. */
+    testIdAttribute: 'data-test',
+
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',

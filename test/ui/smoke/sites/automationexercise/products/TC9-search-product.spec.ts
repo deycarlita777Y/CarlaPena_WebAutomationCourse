@@ -24,7 +24,7 @@ test.describe('Products', () => {
     });
 
     await test.step('Verify all the listed products match the search', async () => {
-      await expect(productsPage.productNames.first()).toBeVisible();
+      await expect(productsPage.productNames).not.toHaveCount(0);
       const names = await productsPage.productNames.allTextContents();
       expect(names.length).toBeGreaterThan(0);
       for (const name of names) {

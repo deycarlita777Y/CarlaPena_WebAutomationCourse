@@ -7,11 +7,12 @@ export class HomePage extends BasePage {
   }
 
   get slider(): Locator {
+    // locator: carousel is a <section> without accessible name
     return this.page.locator('#slider');
   }
 
   get productsLink(): Locator {
-    return this.page.locator('header a[href="/products"]');
+    return this.page.getByRole('banner').getByRole('link', { name: 'Products' });
   }
 
   get homeLink(): Locator {

@@ -110,7 +110,7 @@ src/api/
 - ~~Run Mode 6 on the existing specs~~ — done for TC02 (2026-11-15): 0 errors, 1 warning (R5: `BookStorePage.pageHeading` uses a bare `.first()`). The other specs are not scanned yet.
 - ~~Split the single API class into `client/` + `controllers/`~~ — done; the wiki page was rewritten. `skill-reference.md` and `api-setup-teardown-standard-prompt.md` still need a check against the code.
 - Re-run TC02 on chromium to confirm the refactored `cleanBookshelf` passes against the live site.
-- Fix the R5 warning: replace the bare `.first()` in `BookStorePage.pageHeading` after checking the real DOM.
+- ~~Fix the R5 warning: replace the bare `.first()` in `BookStorePage.pageHeading` after checking the real DOM.~~ — done: `.first()` removed, and the locator was renamed `bookStoreMenuItem` after the DOM check showed it is a sidebar item (see `notes-adapt-ui-locator-wait-standard.md` §8).
 - Give each browser its own demoqa account (`DEMOQA_USER_<BROWSER>`) to re-enable firefox/webkit for TC02.
 - Run Mode 5 to sync README §6/§9 with the new skills, folders and `src/api/`.
 - Decide: add `NODE_USE_SYSTEM_CA=1` to the `test` npm script, or fix the proxy certificate locally.

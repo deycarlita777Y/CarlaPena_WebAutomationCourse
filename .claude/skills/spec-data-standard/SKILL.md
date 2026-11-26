@@ -310,7 +310,7 @@ export const uniqueSuffix = (i: number) =>
 
 ### R13 — EXPECTED_VALUE_FROM_CONTROLLED_SOURCE (WARNING, MANUAL-FIX) · M4
 **Condition:** an assertion on a data-bearing element (title, price, name, status, row) (1) checks presence only (`toBeVisible`, `toHaveCount(>0)`) when the TC intent is a value, or (2) compares against a literal whose source is not a created fixture, mock payload, dataset row or API discovery. Values read from the UI and only compared with each other (`bookA ≠ bookB`) do not satisfy (2) for the entity under test.
-**Fix:** assert the exact value from the M4 source table. Feeds `spec-quality-lifecycle-standard` R10.
+**Fix:** assert the exact value from the M4 source table. Feeds `spec-quality-lifecycle-standard` R10. Values used in `filter({ hasText })` (`ui-locator-wait-standard` R6) follow the same controlled sources.
 
 ### R14 — MOCK_FOR_UNOWNED_CONTENT (WARNING, MANUAL-FIX) · M4
 **Condition:** a test validates rendering/formatting/edge cases of content it does not own (live catalog, third-party data) and cannot predict exact values.
