@@ -43,6 +43,7 @@ src/fixtures/sites/<site>.fixtures.ts     wire controllers into fixtures (setup 
 - Fixtures wire controllers; they do not call `ApiClient` methods directly.
 - Specs receive controllers and data as **fixture parameters**; they never instantiate them and never create/delete through the API themselves (they may read and assert on injected data).
 - `{testRoot}` is `testDir` in `playwright.config.ts`; read it from there.
+- Bounded polling (`ui-locator-wait-standard` R17–R18) needs state reads: controllers expose `get<Resource>Status` and `models/` declares the state union (including terminal failure states). Add them when a resource has asynchronous state.
 
 **demoqa reference:** the layer is `ApiClient` + `AccountController` + `BookController` with endpoints and models. The retry + verify-empty behaviour lives in the `cleanBookshelf` fixture.
 

@@ -3,11 +3,14 @@ import { BasePage } from '@pages/BasePage';
 
 export class BookDetailPage extends BasePage {
   get titleValue(): Locator {
-    return this.page.locator('#title-wrapper #userName-value');
+    // locator: value is a <label> with no accessible name. The id repeats across the page (9 matches on the
+    // detail view, verified in the DOM), so it is only unique inside #title-wrapper (bookInfoBlock).
+    return this.bookInfoBlock.locator('#userName-value');
   }
 
   /** Block holding the book's Title field and value. */
   get bookInfoBlock(): Locator {
+    // locator: block is a plain div with no role or accessible name
     return this.page.locator('#title-wrapper');
   }
 

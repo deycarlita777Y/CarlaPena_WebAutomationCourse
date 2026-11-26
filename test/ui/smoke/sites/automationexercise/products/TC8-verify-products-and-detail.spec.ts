@@ -16,7 +16,7 @@ test.describe('Products', () => {
     await test.step('Open the Products page and verify the products list', async () => {
       await homePage.openProducts();
       await expect(productsPage.allProductsHeading).toBeVisible();
-      await expect(productsPage.productCards.first()).toBeVisible();
+      await expect(productsPage.productCards).not.toHaveCount(0);
     });
 
     await test.step('Open the first product detail page', async () => {

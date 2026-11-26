@@ -2,8 +2,9 @@ import { Locator } from '@playwright/test';
 import { BasePage } from '@pages/BasePage';
 
 export class BookStorePage extends BasePage {
-  get pageHeading(): Locator {
-    return this.page.getByText('Book Store', { exact: true }).first();
+  /** "Book Store" entry of the left sidebar menu. demoqa /books has no heading element (verified in the DOM). */
+  get bookStoreMenuItem(): Locator {
+    return this.page.getByText('Book Store', { exact: true });
   }
 
   get searchInput(): Locator {
@@ -20,7 +21,7 @@ export class BookStorePage extends BasePage {
   }
 
   private get firstBookLink(): Locator {
-    // First row of the catalog table — position is meaningful here
+    // position: first row of the catalog table is the TC intent (open the first book)
     return this.bookList.first().getByRole('link');
   }
 
@@ -30,11 +31,6 @@ export class BookStorePage extends BasePage {
 
   async clickFirstBook(): Promise<void> {
     await this.firstBookLink.click();
-  }
-
-  /** Titles of every book currently listed in the catalog, in table order. */
-  async getBookTitles(): Promise<string[]> {
-    return (await this.bookList.getByRole('link').allInnerTexts()).map((title) => title.trim());
   }
 
   /** Catalog link of the book with the given title. */

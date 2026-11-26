@@ -38,7 +38,7 @@ Already present and reused: `ApiClient`, `AccountController`, `BookController`, 
 
 1. `/profile` renders a **plain HTML table** (`<table>/<tbody>/<tr>`), not react-table. `.rt-tbody` / `.rt-tr-group` locators do not exist. The header row also has the `row` role, so `bookRows` keeps only rows that contain a link.
 2. The delete icon is `<span id="delete-record-<isbn>" title="Delete">` containing an SVG. It is reachable with `getByTitle('Delete')` inside the book's row.
-3. Delete is a **two-stage confirmation**: an in-page modal (`.modal-content`, title "Delete Book", text "Do you want to delete this book?", buttons `#closeSmallModal-ok` / `#closeSmallModal-cancel`), then, after OK, a **native browser alert** "Book deleted." that must be accepted. The TC text only mentions the modal, so `confirmDeletion()` handles the alert too.
+3. Delete is a **two-stage confirmation**: an in-page modal (`role="dialog"` named "Delete Book", located with `getByRole('dialog', { name: 'Delete Book' })`, text "Do you want to delete this book?", buttons `#closeSmallModal-ok` / `#closeSmallModal-cancel`), then, after OK, a **native browser alert** "Book deleted." that must be accepted. The TC text only mentions the modal, so `confirmDeletion()` handles the alert too.
 4. Table order follows insertion order, so "first book" is the first seeded catalog book.
 
 ## Environment notes

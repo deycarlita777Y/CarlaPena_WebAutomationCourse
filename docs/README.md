@@ -46,13 +46,13 @@ If a document fits two places, pick by the question it answers: *why* → `decis
 
 | Area | Document |
 |---|---|
-| Decisions | [0001 git-standards Mode 4](decisions/0001-add-git-standards-mode-4.md) · [0002 spec-quality-lifecycle Mode 6](decisions/0002-add-spec-quality-lifecycle-standard-mode-6.md) · [ADR-001 skill naming](decisions/ADR-001-skill-naming-convention.md) |
+| Decisions | [0001 git-standards Mode 4](decisions/0001-add-git-standards-mode-4.md) · [0002 spec-quality-lifecycle Mode 6](decisions/0002-add-spec-quality-lifecycle-standard-mode-6.md) · [ADR-001 skill naming](decisions/ADR-001-skill-naming-convention.md) · [0006 ui-locator-wait-standard](decisions/0006-add-ui-locator-wait-standard.md) |
 | Specs | [Security for AI-assisted automation frameworks](specs/security-ai-framework.md) |
 | Wiki | [AI governance](wiki/ai-governance.md) · [Getting started with Claude](wiki/getting-started-claude.md) · [Dual-agent setup](wiki/dual-agent-setup.md) · [Init script](wiki/init-script.md) |
 | Wiki — API | [demoqa API layer](wiki/api/demoqa-api-layer.md) |
 | Agents | [Skill reference (Claude)](agents/claude/skill-reference.md) |
 | Test cases — demoqa | [Book Store CRUD (UI)](test-cases/demoqa/book-store-crud-test-cases.md) · [Book Store CRUD (API)](test-cases/demoqa/book-store-api-crud-test-cases.md) |
-| Skill meta-prompts | [automation-architect](skills/automation-architect-skill-prompt.md) · [hub context update](skills/hub-context-update-prompt.md) · [git-conventions](skills/git-conventions-prompt.md) · [git-workflow-docs](skills/git-workflow-docs-standard-prompt.md) · [spec-standards](skills/spec-standards-prompt.md) · [spec-organisation](skills/spec-organisation-standard-prompt.md) · [spec-quality-lifecycle](skills/spec-quality-lifecycle-standard-prompt.md) · [api-setup-teardown](skills/api-setup-teardown-standard-prompt.md) · [living-docs](skills/living-docs-prompt.md) · [README update](skills/readme-update-prompt.md) · [AI automation SDLC onboarding](skills/ai-automation-sdlc-onboarding-prompt.md) |
+| Skill meta-prompts | [automation-architect](skills/automation-architect-skill-prompt.md) · [hub context update](skills/hub-context-update-prompt.md) · [git-conventions](skills/git-conventions-prompt.md) · [git-workflow-docs](skills/git-workflow-docs-standard-prompt.md) · [spec-standards](skills/spec-standards-prompt.md) · [spec-organisation](skills/spec-organisation-standard-prompt.md) · [spec-quality-lifecycle](skills/spec-quality-lifecycle-standard-prompt.md) · [ui-locator-wait](skills/ui-locator-wait-standard-prompt.md) · [api-setup-teardown](skills/api-setup-teardown-standard-prompt.md) · [living-docs](skills/living-docs-prompt.md) · [README update](skills/readme-update-prompt.md) · [AI automation SDLC onboarding](skills/ai-automation-sdlc-onboarding-prompt.md) |
 | Retros | [spec-quality-lifecycle skill notes (rules R1–R12, TC02, API layer)](retros/notes_lifecycle-architect-skill-prompt.md) · [Certificate fix](retros/notes_fixCertificate.md) · [TC02 fix](retros/notes_Fix_TC02-add-book-to-collection.md) |
 
 ## Conventions

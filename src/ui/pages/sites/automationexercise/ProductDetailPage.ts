@@ -3,6 +3,7 @@ import { BasePage } from '@pages/BasePage';
 
 export class ProductDetailPage extends BasePage {
   private get information(): Locator {
+    // locator: details block is a plain div with no role or accessible name
     return this.page.locator('.product-information');
   }
 
